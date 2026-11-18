@@ -36,6 +36,10 @@ class MainActivity : ComponentActivity() {
                 RideLinkRoot(
                     onConnect = { ClusterService.start(this) },
                     onDisconnect = { ClusterService.stop(this) },
+                    onExit = {
+                        ClusterService.exit(this)
+                        finishAndRemoveTask()
+                    },
                 )
             }
         }

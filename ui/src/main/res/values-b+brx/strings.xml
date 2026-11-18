@@ -271,6 +271,11 @@
     <string name="settings_about">सोमोन्दै</string>
     <string name="settings_updates_desc">गोदान RideLink रिलिजनि थाखाय आनजाद नाय</string>
     <string name="settings_about_desc">भार्सन, देभेलपार आरो अपेन-सर्स लाइसेन्सफोर</string>
+    <string name="settings_exit">RideLink बन्द खालाम</string>
+    <string name="settings_exit_desc">बेटारि रैखा खालामनो RideLink खौ आबुङै बन्द खालाम</string>
+    <string name="settings_exit_confirm">बेनि थाखाय स्कुटारनि नांजाबथाया खैफोदबाय आरो RideLink नि बेकग्राउन्डाव थानाय गासै खामानिफोर थादों। एपखौ फिन खेवनो सिम बेयो बन्द जानानै थागोन।</string>
+    <string name="settings_exit_action">बन्द खालाम</string>
+    <string name="status_closing">RideLink बन्द जाबाय दं…</string>
     <string name="settings_developer">देभेलपार सायख’नायफोर</string>
     <string name="settings_developer_mode">देभेलपार म’ड</string>
     <string name="settings_developer_mode_hint">कनसलखौ दिन्थियो: फ्रेम लग, टेस्त फ्रेमफोर आरो देम’ राइड.</string>

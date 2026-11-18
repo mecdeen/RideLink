@@ -18,7 +18,11 @@ import com.aiyu.ridelink.core.nav.MapsTurnIcons
 import com.aiyu.ridelink.core.notify.MessageAlert
 import com.aiyu.ridelink.core.notify.SocialNotificationParser
 import com.aiyu.ridelink.core.settings.AppLocale
+import com.aiyu.ridelink.core.settings.SettingsRepository
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /** Reads Google Maps directions, incoming calls, chat unread counts and the playing song. */
@@ -26,6 +30,9 @@ import javax.inject.Inject
 class RideNotificationListener : NotificationListenerService() {
     @Inject lateinit var controller: ClusterController
     @Inject lateinit var turnIcons: MapsTurnIcons
+    @Inject lateinit var settings: SettingsRepository
+
+    private val scope = MainScope()
 
     private var lastNavKey: String? = null
 
@@ -165,6 +172,9 @@ class RideNotificationListener : NotificationListenerService() {
     private var music: MusicWatcher? = null
 
     override fun onListenerConnected() {
+        instance = this
+        // Android binds the listener again after a reboot, which would wake an app the rider exited.
+        scope.launch { if (settings.current().appExited) release() }
         // A route started before the listener (re)bound is already in the shade; pick it up now.
         runCatching { activeNotifications }.getOrNull()
             ?.filter { it.packageName == MapsNotificationParser.MAPS_PACKAGE }
@@ -177,8 +187,17 @@ class RideNotificationListener : NotificationListenerService() {
     }
 
     override fun onListenerDisconnected() {
+        instance = null
         music?.stop()
         music = null
+    }
+
+    override fun onDestroy() {
+        if (instance === this) instance = null
+        music?.stop()
+        music = null
+        scope.cancel()
+        super.onDestroy()
     }
 
     /** Last `when` + text per notification key: chat apps repost every chat on each message, only a change is new. */
@@ -237,10 +256,17 @@ class RideNotificationListener : NotificationListenerService() {
         return n.fullScreenIntent != null || !n.extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER)
     }
 
-    private companion object {
+    companion object {
+        @Volatile private var instance: RideNotificationListener? = null
+
+        /** Unbinds from the system so it stops keeping the process alive; ClusterService rebinds on the next start. */
+        fun release() {
+            instance?.let { runCatching { it.requestUnbind() } }
+        }
+
         /** Swiggy, Zomato, Blinkit, Zepto, Swiggy Instamart (same app), Dunzo. */
-        val FOOD_APPS = setOf("in.swiggy.android", "com.application.zomato", "com.grofers.customerapp", "com.zeptoconsumerapp", "com.dunzo.user")
+        private val FOOD_APPS = setOf("in.swiggy.android", "com.application.zomato", "com.grofers.customerapp", "com.zeptoconsumerapp", "com.dunzo.user")
         /** Food apps plus Amazon and Flipkart ("Order", as stock N251HelperService.sendSocialmediaNotification). */
-        val DELIVERY_APPS = FOOD_APPS + setOf("in.amazon.mShop.android.shopping", "com.flipkart.android")
+        private val DELIVERY_APPS = FOOD_APPS + setOf("in.amazon.mShop.android.shopping", "com.flipkart.android")
     }
 }

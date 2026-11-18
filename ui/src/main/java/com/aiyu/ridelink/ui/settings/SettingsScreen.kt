@@ -73,6 +73,7 @@ import androidx.compose.material.icons.rounded.Call
 import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.Navigation
 import androidx.compose.material.icons.rounded.PhoneAndroid
+import androidx.compose.material.icons.rounded.PowerSettingsNew
 import androidx.compose.material.icons.rounded.TextFields
 import androidx.compose.material.icons.rounded.TwoWheeler
 import androidx.compose.material3.Card
@@ -129,6 +130,7 @@ fun SettingsScreen(
     onOpenConsole: () -> Unit,
     onOpenUpdates: () -> Unit,
     onOpenAbout: () -> Unit,
+    onExit: () -> Unit,
 ) {
     val s by vm.settings.collectAsStateWithLifecycle()
     val detected by vm.detected.collectAsStateWithLifecycle()
@@ -169,6 +171,21 @@ fun SettingsScreen(
         }
     }
 
+    var confirmExit by remember { mutableStateOf(false) }
+    if (confirmExit) {
+        AlertDialog(
+            onDismissRequest = { confirmExit = false },
+            title = { Text(stringResource(R.string.settings_exit)) },
+            text = { Text(stringResource(R.string.settings_exit_confirm)) },
+            confirmButton = {
+                TextButton(onClick = { confirmExit = false; onExit() }) { Text(stringResource(R.string.settings_exit_action)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmExit = false }) { Text(stringResource(R.string.cancel)) }
+            },
+        )
+    }
+
     val title = section?.title ?: R.string.tab_forwarding
     val scroll = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
@@ -197,6 +214,12 @@ fun SettingsScreen(
                     }
                     item { Section(R.string.settings_developer) }
                     item { SectionGroup(listOf(SettingsSection.DEVELOPER), onOpenSection) }
+                    item { Spacer(Modifier.height(Dimens.xl)) }
+                    item {
+                        Group {
+                            LinkRow(Icons.Rounded.PowerSettingsNew, stringResource(R.string.settings_exit), stringResource(R.string.settings_exit_desc)) { confirmExit = true }
+                        }
+                    }
                     item { BottomBarSpacer() }
                 }
                 SettingsSection.DISPLAY_TEXT -> {

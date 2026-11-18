@@ -12,6 +12,7 @@ import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.PowerManager
+import android.os.Process
 import android.service.notification.NotificationListenerService
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
@@ -42,6 +43,8 @@ class ClusterService : LifecycleService() {
     private var idleJob: Job? = null
     private var statusJob: Job? = null
     private var calls: CallStateWatcher? = null
+    /** Set while the Exit button winds the app down; the process ends with this service. */
+    private var exitJob: Job? = null
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(AppLocale.wrap(newBase))
@@ -60,6 +63,10 @@ class ClusterService : LifecycleService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
+        if (intent?.action == ACTION_EXIT) {
+            exitApp()
+            return START_NOT_STICKY
+        }
         if (intent?.action == ACTION_STOP) {
             // The rider ended the session: stay off until they press Connect, even if the scooter is nearby.
             watchJob?.cancel()
@@ -67,6 +74,9 @@ class ClusterService : LifecycleService() {
             shutDown()
             return START_NOT_STICKY
         }
+        // Opened again while exiting: the rider wants the app after all.
+        exitJob?.cancel()
+        exitJob = null
         startForegroundTyped(notification(getString(R.string.status_connecting)))
         running = true
         controller.start()
@@ -84,8 +94,12 @@ class ClusterService : LifecycleService() {
             }
         }
         if (calls == null) calls = CallStateWatcher(this, controller).takeIf { it.start() }
-        // Android can leave the listener unbound after an app update; without it no Maps or call events arrive.
-        runCatching { NotificationListenerService.requestRebind(ComponentName(this, RideNotificationListener::class.java)) }
+        // Android can leave the listener unbound after an app update or Exit; without it no Maps or call events arrive.
+        // The flag goes first: a listener that binds while it is still set unbinds itself again.
+        lifecycleScope.launch {
+            settings.setAppExited(false)
+            runCatching { NotificationListenerService.requestRebind(ComponentName(this@ClusterService, RideNotificationListener::class.java)) }
+        }
         if (statusJob == null) statusJob = lifecycleScope.launch {
             controller.linkState.collect { state ->
                 val text = when (state) {
@@ -122,6 +136,36 @@ class ClusterService : LifecycleService() {
         stopSelf()
     }
 
+    /**
+     * Exit button: stops everything that keeps RideLink running or can start it again (session, nearby scan,
+     * notification listener, boot start), then ends the process. After a live link the process stays for
+     * [EXIT_WRAP_UP_MS], because the drop saves the ride, the parked spot and the check-in SMS in the background.
+     */
+    private fun exitApp() {
+        if (exitJob != null) return
+        val linked = controller.linkState.value is LinkState.Ready
+        watchJob?.cancel()
+        idleJob?.cancel()
+        statusJob?.cancel()
+        watchJob = null
+        idleJob = null
+        statusJob = null
+        NearbyReceiver.watch(this, null)
+        RideNotificationListener.release()
+        calls?.stop()
+        calls = null
+        controller.stop()
+        exitJob = lifecycleScope.launch {
+            settings.setAppExited(true)
+            if (linked) {
+                getSystemService(NotificationManager::class.java)
+                    .notify(NOTIFICATION_ID, notification(getString(R.string.status_closing), canDisconnect = false))
+                delay(EXIT_WRAP_UP_MS)
+            }
+            stopSelf()
+        }
+    }
+
     private fun hasLocation() = listOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
         .any { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
 
@@ -147,9 +191,10 @@ class ClusterService : LifecycleService() {
         calls?.stop()
         releaseWakeLock()
         super.onDestroy()
+        if (exitJob != null) Process.killProcess(Process.myPid())
     }
 
-    private fun notification(text: String): Notification {
+    private fun notification(text: String, canDisconnect: Boolean = true): Notification {
         val nm = getSystemService(NotificationManager::class.java)
         nm.createNotificationChannel(NotificationChannel(CHANNEL, getString(R.string.channel_ride), NotificationManager.IMPORTANCE_LOW))
         val open = PendingIntent.getActivity(this, 0, Intent(this, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE)
@@ -160,7 +205,7 @@ class ClusterService : LifecycleService() {
             .setContentText(text)
             .setOngoing(true)
             .setContentIntent(open)
-            .addAction(0, getString(R.string.action_end_ride), stop)
+            .apply { if (canDisconnect) addAction(0, getString(R.string.action_end_ride), stop) }
             .build()
     }
 
@@ -168,9 +213,12 @@ class ClusterService : LifecycleService() {
         private const val CHANNEL = "ride"
         private const val NOTIFICATION_ID = 1
         private const val ACTION_STOP = "stop"
+        private const val ACTION_EXIT = "exit"
         private const val WAKE_LOCK_MS = 30 * 60_000L
         /** Rides out short drops (tunnel, restart) before ending the session. */
         private const val IDLE_STOP_MS = 60_000L
+        /** Next recorder tick (5 s) + the longest location fix (30 s) + the place lookup. */
+        private const val EXIT_WRAP_UP_MS = 40_000L
 
         /** True while this process runs the session; a killed process reads false again. */
         @Volatile var running = false
@@ -178,5 +226,6 @@ class ClusterService : LifecycleService() {
 
         fun start(context: Context) = ContextCompat.startForegroundService(context, Intent(context, ClusterService::class.java))
         fun stop(context: Context) = context.startService(Intent(context, ClusterService::class.java).setAction(ACTION_STOP))
+        fun exit(context: Context) = context.startService(Intent(context, ClusterService::class.java).setAction(ACTION_EXIT))
     }
 }

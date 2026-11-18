@@ -271,6 +271,11 @@
     <string name="settings_about">متعلق</string>
     <string name="settings_updates_desc">RideLink کی نئی ریلیز چیک کریں</string>
     <string name="settings_about_desc">ورژن، ڈویلپر اور اوپن سورس لائسنسز</string>
+    <string name="settings_exit">RideLink بند کریں</string>
+    <string name="settings_exit_desc">بیٹری بچانے کے لیے RideLink مکمل طور پر بند کریں</string>
+    <string name="settings_exit_confirm">اس سے اسکوٹر منقطع ہو جائے گا اور RideLink کا پس منظر میں چلنے والا سارا کام رک جائے گا۔ ایپ دوبارہ کھولنے تک یہ بند رہے گا۔</string>
+    <string name="settings_exit_action">بند کریں</string>
+    <string name="status_closing">RideLink بند ہو رہا ہے…</string>
     <string name="settings_developer">ڈویلپر اختیارات</string>
     <string name="settings_developer_mode">ڈویلپر موڈ</string>
     <string name="settings_developer_mode_hint">کنسول دکھاتا ہے: فریم لاگ، ٹیسٹ فریمز اور ڈیمو سواری۔</string>

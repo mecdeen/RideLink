@@ -271,6 +271,11 @@
     <string name="settings_about">विषये</string>
     <string name="settings_updates_desc">नूतनं RideLink संस्करणं परीक्षताम्</string>
     <string name="settings_about_desc">संस्करणं, विकासकः, मुक्तस्रोत-अनुज्ञप्तयश्च</string>
+    <string name="settings_exit">RideLink पिदधातु</string>
+    <string name="settings_exit_desc">विद्युत्कोशरक्षणाय RideLink पूर्णतया पिदधातु</string>
+    <string name="settings_exit_confirm">अनेन स्कूटरयानं वियुज्यते, RideLink इत्यस्य पृष्ठभूमिकार्याणि सर्वाणि च स्थगन्ति। अनुप्रयोगस्य पुनरुद्घाटनपर्यन्तम् इदं निष्क्रियं तिष्ठति।</string>
+    <string name="settings_exit_action">पिदधातु</string>
+    <string name="status_closing">RideLink पिधीयते…</string>
     <string name="settings_developer">विकासकविकल्पाः</string>
     <string name="settings_developer_mode">विकासकस्थितिः</string>
     <string name="settings_developer_mode_hint">नियन्त्रणपटलं दर्शयति: चित्रकवृत्तान्तः, परीक्षणचित्रकाणि, निदर्शनयात्रा च।</string>

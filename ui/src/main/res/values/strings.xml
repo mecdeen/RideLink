@@ -271,6 +271,11 @@
     <string name="settings_about">About</string>
     <string name="settings_updates_desc">Check for a newer RideLink release</string>
     <string name="settings_about_desc">Version, developer and open-source licences</string>
+    <string name="settings_exit">Exit RideLink</string>
+    <string name="settings_exit_desc">Stop RideLink completely to save battery</string>
+    <string name="settings_exit_confirm">This disconnects the scooter and stops everything RideLink runs in the background. It stays off until you open the app again.</string>
+    <string name="settings_exit_action">Exit</string>
+    <string name="status_closing">Closing RideLink…</string>
     <string name="settings_developer">Developer options</string>
     <string name="settings_developer_mode">Developer mode</string>
     <string name="settings_developer_mode_hint">Shows the Console: frame log, test frames and demo ride.</string>

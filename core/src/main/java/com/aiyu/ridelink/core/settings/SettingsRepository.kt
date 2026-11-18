@@ -111,6 +111,8 @@ data class Settings(
     val checkInName: String = "",
     /** Optional BCP-47 language tag (null/blank = System default). */
     val languageTag: String? = null,
+    /** The rider used Exit: nothing starts in the background (boot included) until the app is opened again. */
+    val appExited: Boolean = false,
 ) {
     companion object {
         val BRIGHTNESS_RANGE = 2..5
@@ -181,6 +183,7 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
         val checkInNumber = stringPreferencesKey("check_in_number")
         val checkInName = stringPreferencesKey("check_in_name")
         val languageTag = stringPreferencesKey("language_tag")
+        val appExited = booleanPreferencesKey("app_exited")
     }
 
     val settings: Flow<Settings> = context.store.data.map { p ->
@@ -240,6 +243,7 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
             checkInNumber = p[K.checkInNumber] ?: "",
             checkInName = p[K.checkInName] ?: "",
             languageTag = p[K.languageTag]?.takeIf { it.isNotBlank() },
+            appExited = p[K.appExited] ?: false,
         )
     }
 
@@ -313,6 +317,7 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
             if (bike == null) it.remove(K.parkedBike) else it[K.parkedBike] = bike
         }
     }
+    suspend fun setAppExited(exited: Boolean) { context.store.edit { it[K.appExited] = exited } }
     suspend fun setLanguageTag(tag: String?) {
         val clean = tag?.trim()?.takeIf { it.isNotEmpty() }
         context.store.edit {

@@ -271,6 +271,11 @@
     <string name="settings_about">ಬಗ್ಗೆ</string>
     <string name="settings_updates_desc">ಹೊಸ RideLink ಬಿಡುಗಡೆಗಾಗಿ ಪರಿಶೀಲಿಸಿ</string>
     <string name="settings_about_desc">ಆವೃತ್ತಿ, ಡೆವಲಪರ್ ಮತ್ತು ಓಪನ್-ಸೋರ್ಸ್ ಪರವಾನಗಿಗಳು</string>
+    <string name="settings_exit">RideLink ಮುಚ್ಚಿ</string>
+    <string name="settings_exit_desc">ಬ್ಯಾಟರಿ ಉಳಿಸಲು RideLink ಅನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ನಿಲ್ಲಿಸಿ</string>
+    <string name="settings_exit_confirm">ಇದು ಸ್ಕೂಟರ್ ಸಂಪರ್ಕವನ್ನು ಕಡಿತಗೊಳಿಸುತ್ತದೆ ಮತ್ತು RideLink ಹಿನ್ನೆಲೆಯಲ್ಲಿ ನಡೆಸುವ ಎಲ್ಲವನ್ನೂ ನಿಲ್ಲಿಸುತ್ತದೆ. ಆ್ಯಪ್ ಅನ್ನು ಮತ್ತೆ ತೆರೆಯುವವರೆಗೆ ಇದು ಆಫ್ ಆಗಿರುತ್ತದೆ.</string>
+    <string name="settings_exit_action">ಮುಚ್ಚಿ</string>
+    <string name="status_closing">RideLink ಮುಚ್ಚಲಾಗುತ್ತಿದೆ…</string>
     <string name="settings_developer">ಡೆವಲಪರ್ ಆಯ್ಕೆಗಳು</string>
     <string name="settings_developer_mode">ಡೆವಲಪರ್ ಮೋಡ್</string>
     <string name="settings_developer_mode_hint">ಕನ್ಸೋಲ್ ತೋರಿಸುತ್ತದೆ: ಫ್ರೇಮ್ ಲಾಗ್, ಪರೀಕ್ಷಾ ಫ್ರೇಮ್‌ಗಳು ಮತ್ತು ಡೆಮೋ ರೈಡ್.</string>

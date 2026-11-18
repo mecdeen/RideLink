@@ -271,6 +271,11 @@
     <string name="settings_about">विशीं</string>
     <string name="settings_updates_desc">नवी RideLink आवृत्ती तपासची</string>
     <string name="settings_about_desc">आवृत्ती, विकासक आनी मुक्त-स्रोत परवाने</string>
+    <string name="settings_exit">RideLink बंद करात</string>
+    <string name="settings_exit_desc">बॅटरी वाचोवंक RideLink पुरायपणान बंद करात</string>
+    <string name="settings_exit_confirm">हाचेवरवीं स्कूटराचो संपर्क तुटतलो आनी RideLink फाटभूंयेर चलयता तीं सगळीं कामां बंद जातलीं. ॲप परत उगडटा मेरेन तें बंद उरतलें.</string>
+    <string name="settings_exit_action">बंद करात</string>
+    <string name="status_closing">RideLink बंद जाता…</string>
     <string name="settings_developer">विकासक पर्याय</string>
     <string name="settings_developer_mode">विकासक मोड</string>
     <string name="settings_developer_mode_hint">कन्सोल दाखयता: फ्रेम लॉग, चांचणी फ्रेमो आनी डॅमो रायड.</string>

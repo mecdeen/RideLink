@@ -271,6 +271,11 @@
     <string name="settings_about">बारेमा</string>
     <string name="settings_updates_desc">नयाँ RideLink रिलिज जाँच गर्नुहोस्</string>
     <string name="settings_about_desc">संस्करण, विकासकर्ता र खुला स्रोत इजाजतपत्रहरू</string>
+    <string name="settings_exit">RideLink बन्द गर्नुहोस्</string>
+    <string name="settings_exit_desc">ब्याट्री बचाउन RideLink पूर्ण रूपमा बन्द गर्नुहोस्</string>
+    <string name="settings_exit_confirm">यसले स्कुटर विच्छेद गर्छ र RideLink ले पृष्ठभूमिमा चलाउने सबै कुरा रोक्छ। एप फेरि नखोलेसम्म यो बन्द रहन्छ।</string>
+    <string name="settings_exit_action">बन्द गर्नुहोस्</string>
+    <string name="status_closing">RideLink बन्द हुँदैछ…</string>
     <string name="settings_developer">विकासकर्ता विकल्पहरू</string>
     <string name="settings_developer_mode">विकासकर्ता मोड</string>
     <string name="settings_developer_mode_hint">कन्सोल देखाउँछ: फ्रेम लग, परीक्षण फ्रेमहरू र डेमो राइड।</string>

@@ -271,6 +271,11 @@
     <string name="settings_about">ᱵᱟᱵᱚᱛ</string>
     <string name="settings_updates_desc">ᱱᱟᱣᱟ RideLink ᱨᱤᱞᱤᱡᱽ ᱞᱟᱹᱜᱤᱫ ᱛᱩᱱᱠᱷᱤ ᱢᱮ</string>
     <string name="settings_about_desc">ᱵᱷᱟᱨᱥᱚᱱ, ᱰᱮᱵᱷᱮᱞᱚᱯᱟᱨ ᱟᱨ ᱚᱯᱮᱱ-ᱥᱚᱨᱥ ᱞᱟᱭᱥᱮᱱᱥ</string>
+    <string name="settings_exit">RideLink ᱵᱚᱸᱫᱽ ᱢᱮ</string>
+    <string name="settings_exit_desc">ᱵᱮᱴᱟᱨᱤ ᱵᱟᱧᱪᱟᱣ ᱞᱟᱹᱜᱤᱫ RideLink ᱯᱩᱨᱟᱹ ᱵᱚᱸᱫᱽ ᱢᱮ</string>
+    <string name="settings_exit_confirm">ᱱᱚᱶᱟ ᱥᱠᱩᱴᱚᱨ ᱵᱷᱮᱜᱟᱨᱟ ᱟᱨ RideLink ᱨᱮᱭᱟᱜ ᱵᱮᱠᱜᱨᱟᱣᱩᱱᱰ ᱠᱟᱹᱢᱤ ᱡᱚᱛᱚ ᱵᱚᱸᱫᱽᱟ᱾ ᱮᱯ ᱫᱩᱦᱲᱟᱹ ᱡᱷᱤᱡᱽ ᱦᱟᱹᱵᱤᱡ ᱱᱚᱶᱟ ᱵᱚᱸᱫᱽ ᱛᱟᱦᱮᱱᱟ᱾</string>
+    <string name="settings_exit_action">ᱵᱚᱸᱫᱽ ᱢᱮ</string>
+    <string name="status_closing">RideLink ᱵᱚᱸᱫᱽ ᱠᱟᱱᱟ…</string>
     <string name="settings_developer">ᱰᱮᱵᱷᱮᱞᱚᱯᱟᱨ ᱵᱟᱪᱷᱟᱣ ᱠᱚ</string>
     <string name="settings_developer_mode">ᱰᱮᱵᱷᱮᱞᱚᱯᱟᱨ ᱢᱚᱰ</string>
     <string name="settings_developer_mode_hint">ᱠᱚᱱᱥᱚᱞ ᱩᱫᱩᱜᱟ: ᱯᱷᱨᱮᱢ ᱞᱚᱜᱽ, ᱵᱤᱰᱟᱹᱣ ᱯᱷᱨᱮᱢ ᱟᱨ ᱰᱮᱢᱚ ᱨᱟᱭᱤᱰ.</string>

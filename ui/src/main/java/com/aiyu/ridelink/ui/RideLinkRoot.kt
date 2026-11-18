@@ -88,7 +88,7 @@ private const val SETTINGS = "settings:"
 private const val RIDE = "ride:"
 
 @Composable
-fun RideLinkRoot(onConnect: () -> Unit, onDisconnect: () -> Unit) {
+fun RideLinkRoot(onConnect: () -> Unit, onDisconnect: () -> Unit, onExit: () -> Unit) {
     val vm: MainViewModel = hiltViewModel()
     val updates: UpdateViewModel = hiltViewModel()
     var tab by rememberSaveable { mutableIntStateOf(0) }
@@ -121,6 +121,7 @@ fun RideLinkRoot(onConnect: () -> Unit, onDisconnect: () -> Unit) {
     LaunchedEffect(Unit) { updates.checkQuietly() }
     val connect = { vm.userStopped = false; onConnect() }
     val disconnect = { vm.userStopped = true; onDisconnect() }
+    val exit = { vm.userStopped = true; onExit() }
 
     val holder = rememberSaveableStateHolder()
     val motion = MaterialTheme.motionScheme
@@ -147,6 +148,7 @@ fun RideLinkRoot(onConnect: () -> Unit, onDisconnect: () -> Unit) {
                 onOpenConsole = { push(Page.Console.name) },
                 onOpenUpdates = { push(Page.Updates.name) },
                 onOpenAbout = { push(Page.About.name) },
+                onExit = exit,
             )
         }
         // AnimatedContent drops a page's composition when it leaves; the holder keeps its scroll state for the way back.

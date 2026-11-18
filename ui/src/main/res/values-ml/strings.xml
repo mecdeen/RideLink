@@ -271,6 +271,11 @@
     <string name="settings_about">കുറിച്ച്</string>
     <string name="settings_updates_desc">പുതിയ RideLink റിലീസിനായി പരിശോധിക്കുക</string>
     <string name="settings_about_desc">പതിപ്പ്, ഡെവലപ്പർ, ഓപ്പൺ സോഴ്സ് ലൈസൻസുകൾ</string>
+    <string name="settings_exit">RideLink അടയ്ക്കുക</string>
+    <string name="settings_exit_desc">ബാറ്ററി ലാഭിക്കാൻ RideLink പൂർണ്ണമായി നിർത്തുക</string>
+    <string name="settings_exit_confirm">ഇത് സ്കൂട്ടർ വിച്ഛേദിക്കുകയും RideLink പശ്ചാത്തലത്തിൽ പ്രവർത്തിപ്പിക്കുന്നതെല്ലാം നിർത്തുകയും ചെയ്യും. ആപ്പ് വീണ്ടും തുറക്കുന്നത് വരെ ഇത് ഓഫായിരിക്കും.</string>
+    <string name="settings_exit_action">അടയ്ക്കുക</string>
+    <string name="status_closing">RideLink അടയ്ക്കുന്നു…</string>
     <string name="settings_developer">ഡെവലപ്പർ ഓപ്ഷനുകൾ</string>
     <string name="settings_developer_mode">ഡെവലപ്പർ മോഡ്</string>
     <string name="settings_developer_mode_hint">കൺസോൾ കാണിക്കുന്നു: ഫ്രെയിം ലോഗ്, ടെസ്റ്റ് ഫ്രെയിമുകൾ, ഡെമോ റൈഡ്.</string>

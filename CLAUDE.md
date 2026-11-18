@@ -44,7 +44,8 @@ Modules:
    address; if Android kills the app, ignition-on wakes `NearbyReceiver`, which restarts the service
    (Android 12+: needs battery optimisation off, else it posts a "Scooter nearby" tap-to-connect notification).
    Disconnect disarms it. With no link for 60 s (scooter off) the service ends itself and its notification;
-   the armed scan brings it back at the next ignition on.
+   the armed scan brings it back at the next ignition on. Settings -> Exit RideLink stops the session, scan,
+   notification listener and boot start, then ends the process; opening the app again undoes it (`appExited`).
 3. `ClusterLink` connects, requests MTU 512, enables notify on `5354`, then writes on `5352`
    with response, one frame at a time. Setup has a 15 s watchdog; a drop, GATT error or failed discovery
    falls back to a background `autoConnect = true` connect plus a filtered scan for the scooter's address, and the
