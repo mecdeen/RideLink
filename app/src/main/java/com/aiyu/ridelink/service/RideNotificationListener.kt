@@ -6,6 +6,7 @@ import android.app.RemoteInput
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.content.ComponentName
 import android.os.Build
@@ -34,7 +35,8 @@ class RideNotificationListener : NotificationListenerService() {
 
     private val scope = MainScope()
 
-    private var lastNavKey: String? = null
+    /** Last update handled per Maps notification key, so [syncMaps] can tell which ones never reached us. */
+    private val seenMaps = HashMap<String, String>()
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(AppLocale.wrap(newBase))
@@ -47,6 +49,7 @@ class RideNotificationListener : NotificationListenerService() {
         val text = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()
         when {
             sbn.packageName == MapsNotificationParser.MAPS_PACKAGE -> {
+                seenMaps[sbn.key] = mapsUpdateId(sbn)
                 val sub = extras.getCharSequence(Notification.EXTRA_SUB_TEXT)?.toString()
                 // Maps names only the street; the turn direction is in the large icon.
                 val turn = runCatching { turnIcons.classify(n.getLargeIcon()) }.getOrNull()
@@ -125,6 +128,32 @@ class RideNotificationListener : NotificationListenerService() {
         action.actionIntent.send(this, 0, fill)
     }.isSuccess
 
+    private fun mapsUpdateId(sbn: StatusBarNotification): String {
+        val extras = sbn.notification.extras
+        return listOf(Notification.EXTRA_TITLE, Notification.EXTRA_TEXT, Notification.EXTRA_SUB_TEXT)
+            .joinToString("|", prefix = "${sbn.postTime}|") { extras.getCharSequence(it)?.toString().orEmpty() }
+    }
+
+    /**
+     * Compares the shade with what the callbacks delivered: Android can leave a listener bound but silent, so a route
+     * start, step or end may never arrive. False when Android no longer serves this listener at all.
+     */
+    private fun syncMaps(): Boolean {
+        val shade = runCatching { activeNotifications }.getOrNull() ?: return false
+        val maps = shade.filter { it.packageName == MapsNotificationParser.MAPS_PACKAGE }
+        seenMaps.keys.retainAll(maps.mapTo(HashSet()) { it.key })
+        maps.filter { seenMaps[it.key] != mapsUpdateId(it) }.forEach {
+            controller.note("Maps: picked up an update the listener missed")
+            onNotificationPosted(it)
+        }
+        if (lastNavKey != null && maps.none { it.key == lastNavKey }) {
+            lastNavKey = null
+            controller.note("Maps: route ended while the listener was silent")
+            controller.onNavigationEnded()
+        }
+        return true
+    }
+
     private var lastSms: String? = null
     private var lastDelivery: String? = null
     private val smsPackage: String? by lazy { runCatching { Telephony.Sms.getDefaultSmsPackage(this) }.getOrNull() }
@@ -173,8 +202,9 @@ class RideNotificationListener : NotificationListenerService() {
 
     override fun onListenerConnected() {
         instance = this
-        // Android binds the listener again after a reboot, which would wake an app the rider exited.
-        scope.launch { if (settings.current().appExited) release() }
+        // Android binds the listener again after a reboot, which would wake an app the rider exited. A running session
+        // means the app was opened again and the saved flag is simply about to be cleared.
+        scope.launch { if (settings.current().appExited && !ClusterService.running) release() }
         // A route started before the listener (re)bound is already in the shade; pick it up now.
         runCatching { activeNotifications }.getOrNull()
             ?.filter { it.packageName == MapsNotificationParser.MAPS_PACKAGE }
@@ -259,9 +289,29 @@ class RideNotificationListener : NotificationListenerService() {
     companion object {
         @Volatile private var instance: RideNotificationListener? = null
 
+        /** Kept across rebinds in one process, like the route it belongs to in ClusterController. */
+        private var lastNavKey: String? = null
+
         /** Unbinds from the system so it stops keeping the process alive; ClusterService rebinds on the next start. */
         fun release() {
             instance?.let { runCatching { it.requestUnbind() } }
+        }
+
+        /** Catches up on missed Maps updates. False when the listener is not connected and needs [rebind]. */
+        fun sync(): Boolean = instance?.syncMaps() == true
+
+        /**
+         * Asks Android to connect the listener again. [force] also switches the component off and on, which recovers
+         * a stale binding that requestRebind alone ignores because Android still counts it as bound.
+         */
+        fun rebind(context: Context, force: Boolean = false) {
+            val component = ComponentName(context, RideNotificationListener::class.java)
+            if (force) runCatching {
+                val pm = context.packageManager
+                pm.setComponentEnabledSetting(component, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
+                pm.setComponentEnabledSetting(component, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
+            }
+            runCatching { requestRebind(component) }
         }
 
         /** Swiggy, Zomato, Blinkit, Zepto, Swiggy Instamart (same app), Dunzo. */

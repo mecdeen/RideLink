@@ -55,7 +55,8 @@ Modules:
 5. `RideNotificationListener` turns Google Maps notifications into `NavStep`s
    (nav text frame, 400 ms gap, nav control frame), call notifications into a caller frame
    repeated every 500 ms while ringing, and WhatsApp/Facebook/Instagram notifications into `5B 9C`
-   counts. `MusicWatcher` follows the active media session (`5B 62/63/60`).
+   counts. `MusicWatcher` follows the active media session (`5B 62/63/60`). While the session runs, `ClusterService`
+   checks the listener every 5 s: it picks up Maps updates missed in the shade and reconnects a dropped listener.
 6. Frames from the display are logged and folded into `DisplayTelemetry` (speed, odometer, trip, fuel,
    range, speeds, mileage). A change of `5A 10` byte 12 accepts/rejects the ringing call. Also used for
    Auto model detection.
