@@ -110,6 +110,11 @@
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
+            <!-- Android 12+ lets the system (and some OEM skins by default) hide notification types from a listener.
+                 The Maps turn notification is ongoing + silent, so all four types must be on. -->
+            <meta-data
+                android:name="android.service.notification.default_filter_types"
+                android:value="conversations|alerting|ongoing|silent" />
         </service>
 
         <receiver
