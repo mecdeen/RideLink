@@ -6,6 +6,7 @@ import android.app.RemoteInput
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.content.ComponentName
 import android.os.Build
@@ -36,7 +37,8 @@ class RideNotificationListener : NotificationListenerService() {
     @Inject lateinit var controller: ClusterController
     @Inject lateinit var turnIcons: MapsTurnIcons
 
-    private var lastNavKey: String? = null
+    /** Last update handled per Maps notification key, so [syncMaps] can tell which ones never reached us. */
+    private val seenMaps = HashMap<String, String>()
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(AppLocale.wrap(newBase))
@@ -49,6 +51,7 @@ class RideNotificationListener : NotificationListenerService() {
         val text = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()
         when {
             sbn.packageName == MapsNotificationParser.MAPS_PACKAGE -> {
+                seenMaps[sbn.key] = mapsUpdateId(sbn)
                 val sub = extras.getCharSequence(Notification.EXTRA_SUB_TEXT)?.toString()
                 // Maps names only the street; the turn direction is in the large icon.
                 val turn = runCatching { turnIcons.classify(n.getLargeIcon()) }.getOrNull()
@@ -127,6 +130,32 @@ class RideNotificationListener : NotificationListenerService() {
         action.actionIntent.send(this, 0, fill)
     }.isSuccess
 
+    private fun mapsUpdateId(sbn: StatusBarNotification): String {
+        val extras = sbn.notification.extras
+        return listOf(Notification.EXTRA_TITLE, Notification.EXTRA_TEXT, Notification.EXTRA_SUB_TEXT)
+            .joinToString("|", prefix = "${sbn.postTime}|") { extras.getCharSequence(it)?.toString().orEmpty() }
+    }
+
+    /**
+     * Compares the shade with what the callbacks delivered: Android (MIUI/HyperOS especially) can leave a listener
+     * bound but silent, so a route start, step or end may never arrive. False when Android no longer serves it at all.
+     */
+    private fun syncMaps(): Boolean {
+        val shade = runCatching { activeNotifications }.getOrNull() ?: return false
+        val maps = shade.filter { it.packageName == MapsNotificationParser.MAPS_PACKAGE }
+        seenMaps.keys.retainAll(maps.mapTo(HashSet()) { it.key })
+        maps.filter { seenMaps[it.key] != mapsUpdateId(it) }.forEach {
+            controller.note("Maps: picked up an update the listener missed")
+            onNotificationPosted(it)
+        }
+        if (lastNavKey != null && maps.none { it.key == lastNavKey }) {
+            lastNavKey = null
+            controller.note("Maps: route ended while the listener was silent")
+            controller.onNavigationEnded()
+        }
+        return true
+    }
+
     private var lastSms: String? = null
     private var lastDelivery: String? = null
     private val smsPackage: String? by lazy { runCatching { Telephony.Sms.getDefaultSmsPackage(this) }.getOrNull() }
@@ -174,6 +203,7 @@ class RideNotificationListener : NotificationListenerService() {
     private var music: MusicWatcher? = null
 
     override fun onListenerConnected() {
+        instance = this
         // A route started before the listener (re)bound is already in the shade; pick it up now.
         runCatching { activeNotifications }.getOrNull()
             ?.filter { it.packageName == MapsNotificationParser.MAPS_PACKAGE }
@@ -212,6 +242,7 @@ class RideNotificationListener : NotificationListenerService() {
         (n.flags and (Notification.FLAG_GROUP_SUMMARY or Notification.FLAG_ONGOING_EVENT)) == 0 && n.category != Notification.CATEGORY_CALL
 
     override fun onListenerDisconnected() {
+        if (instance === this) instance = null
         linkWatch?.cancel()
         linkWatch = null
         music?.stop()
@@ -266,10 +297,32 @@ class RideNotificationListener : NotificationListenerService() {
     private fun isIncoming(n: Notification) =
         CallNotice.isRinging(n.extras.getInt(Notification.EXTRA_CALL_TYPE, -1), n.fullScreenIntent != null, n.flags)
 
-    private companion object {
+    companion object {
+        @Volatile private var instance: RideNotificationListener? = null
+
+        /** Kept across rebinds in one process, like the route it belongs to in ClusterController. */
+        private var lastNavKey: String? = null
+
+        /** Catches up on missed Maps updates. False when the listener is not connected and needs [rebind]. */
+        fun sync(): Boolean = instance?.syncMaps() == true
+
+        /**
+         * Asks Android to connect the listener again. [force] also switches the component off and on, which recovers
+         * a stale binding that requestRebind alone ignores because Android still counts it as bound.
+         */
+        fun rebind(context: Context, force: Boolean = false) {
+            val component = ComponentName(context, RideNotificationListener::class.java)
+            if (force) runCatching {
+                val pm = context.packageManager
+                pm.setComponentEnabledSetting(component, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
+                pm.setComponentEnabledSetting(component, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
+            }
+            runCatching { requestRebind(component) }
+        }
+
         /** Swiggy, Zomato, Blinkit, Zepto, Swiggy Instamart (same app), Dunzo. */
-        val FOOD_APPS = setOf("in.swiggy.android", "com.application.zomato", "com.grofers.customerapp", "com.zeptoconsumerapp", "com.dunzo.user")
+        private val FOOD_APPS = setOf("in.swiggy.android", "com.application.zomato", "com.grofers.customerapp", "com.zeptoconsumerapp", "com.dunzo.user")
         /** Food apps plus Amazon and Flipkart ("Order", as stock N251HelperService.sendSocialmediaNotification). */
-        val DELIVERY_APPS = FOOD_APPS + setOf("in.amazon.mShop.android.shopping", "com.flipkart.android")
+        private val DELIVERY_APPS = FOOD_APPS + setOf("in.amazon.mShop.android.shopping", "com.flipkart.android")
     }
 }

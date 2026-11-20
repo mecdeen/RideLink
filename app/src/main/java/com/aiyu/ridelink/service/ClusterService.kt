@@ -5,15 +5,14 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.PowerManager
-import android.service.notification.NotificationListenerService
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
@@ -42,6 +41,7 @@ class ClusterService : LifecycleService() {
     private var watchJob: Job? = null
     private var idleJob: Job? = null
     private var statusJob: Job? = null
+    private var listenerJob: Job? = null
     private var calls: CallStateWatcher? = null
 
     override fun attachBaseContext(newBase: Context) {
@@ -95,7 +95,8 @@ class ClusterService : LifecycleService() {
         }
         if (calls == null) calls = CallStateWatcher(this, controller).takeIf { it.start() }
         // Android can leave the listener unbound after an app update; without it no Maps or call events arrive.
-        runCatching { NotificationListenerService.requestRebind(ComponentName(this, RideNotificationListener::class.java)) }
+        RideNotificationListener.rebind(this)
+        if (listenerJob == null) listenerJob = lifecycleScope.launch { watchListener() }
         if (statusJob == null) statusJob = lifecycleScope.launch {
             controller.linkState.collect { state ->
                 val text = when (state) {
@@ -109,6 +110,30 @@ class ClusterService : LifecycleService() {
             }
         }
         return START_STICKY
+    }
+
+    /**
+     * Keeps Maps detection alive for the whole session: picks up updates the listener missed and reconnects it when
+     * Android drops it. A plain rebind goes first; a binding that stays dead is forced.
+     */
+    private suspend fun watchListener() {
+        var failures = 0
+        while (true) {
+            delay(LISTENER_CHECK_MS)
+            val granted = packageName in NotificationManagerCompat.getEnabledListenerPackages(this)
+            if (!granted || RideNotificationListener.sync()) {
+                failures = 0
+                continue
+            }
+            failures++
+            if (failures == 1) {
+                controller.note("Notification listener disconnected, reconnecting")
+                RideNotificationListener.rebind(this)
+            } else if (failures % FORCE_REBIND_EVERY == FORCE_REBIND_AFTER) {
+                controller.note("Notification listener still disconnected, forcing a reconnect")
+                RideNotificationListener.rebind(this, force = true)
+            }
+        }
     }
 
     /**
@@ -184,6 +209,10 @@ class ClusterService : LifecycleService() {
         private const val WAKE_LOCK_MS = 30 * 60_000L
         /** Rides out short drops (tunnel, restart) before ending the session. */
         private const val IDLE_STOP_MS = 60_000L
+        private const val LISTENER_CHECK_MS = 5_000L
+        /** Failed checks: forced at the 3rd, then once every 12 (a minute) while it stays dead. */
+        private const val FORCE_REBIND_AFTER = 3
+        private const val FORCE_REBIND_EVERY = 12
 
         /** True while this process runs the session; a killed process reads false again. */
         @Volatile var running = false
