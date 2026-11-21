@@ -20,7 +20,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/** Quick settings tile: shows the link state and opens [ConnectionPanelActivity], like Android's Internet tile. */
+/**
+ * Quick settings tile: shows the link state. A tap while RideLink runs closes it completely (the notification's Exit);
+ * a tap while it is off opens [ConnectionPanelActivity], which may start the ride service because it is visible.
+ */
 @AndroidEntryPoint
 class ConnectionTileService : TileService() {
     @Inject lateinit var controller: ClusterController
@@ -49,7 +52,14 @@ class ConnectionTileService : TileService() {
 
     private fun show(link: LinkState, name: String?) {
         val tile = qsTile ?: return
-        tile.state = if (link is LinkState.Ready) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
+        // Active = RideLink is running, so a tap closes it.
+        tile.state = if (isRunning(link)) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
+        if (ClusterService.exiting) {
+            tile.label = getString(R.string.app_name)
+            if (Build.VERSION.SDK_INT >= 29) tile.subtitle = getString(R.string.status_closing)
+            tile.updateTile()
+            return
+        }
         tile.label = getString(R.string.app_name)
         if (Build.VERSION.SDK_INT >= 29) {
             tile.subtitle = when (link) {
@@ -61,8 +71,20 @@ class ConnectionTileService : TileService() {
         tile.updateTile()
     }
 
+    private fun isRunning(link: LinkState) = !ClusterService.exiting && (ClusterService.running || link !is LinkState.Idle)
+
     override fun onClick() {
         super.onClick()
+        // The running foreground service lets this start command through; Exit ends the process with it.
+        // Android refuses it from the background if the service already ended: open the panel instead.
+        if (isRunning(controller.linkState.value) && runCatching { ClusterService.exit(this) }.isSuccess) {
+            qsTile?.apply {
+                state = Tile.STATE_INACTIVE
+                if (Build.VERSION.SDK_INT >= 29) subtitle = getString(R.string.status_closing)
+                updateTile()
+            }
+            return
+        }
         unlockAndRun {
             val panel = Intent(this, ConnectionPanelActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             if (Build.VERSION.SDK_INT >= 34) {

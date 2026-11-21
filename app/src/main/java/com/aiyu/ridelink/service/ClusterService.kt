@@ -79,6 +79,7 @@ class ClusterService : LifecycleService() {
         // Opened again while exiting: the rider wants the app after all.
         exitJob?.cancel()
         exitJob = null
+        exiting = false
         if (!startForegroundTyped(notification(getString(R.string.status_connecting)))) {
             // Android refused a background start (a sticky restart): ask the rider instead of crashing.
             NearbyReceiver.promptToConnect(this)
@@ -181,6 +182,7 @@ class ClusterService : LifecycleService() {
      */
     private fun exitApp() {
         if (exitJob != null) return
+        exiting = true
         val linked = controller.linkState.value is LinkState.Ready
         watchJob?.cancel()
         idleJob?.cancel()
@@ -274,6 +276,10 @@ class ClusterService : LifecycleService() {
 
         /** True while this process runs the session; a killed process reads false again. */
         @Volatile var running = false
+            private set
+
+        /** Exit is winding the app down (up to [EXIT_WRAP_UP_MS]); the quick settings tile already shows it off. */
+        @Volatile var exiting = false
             private set
 
         fun start(context: Context) = ContextCompat.startForegroundService(context, Intent(context, ClusterService::class.java))
