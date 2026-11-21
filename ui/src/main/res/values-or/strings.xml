@@ -271,6 +271,11 @@
     <string name="settings_about">ବିଷୟରେ</string>
     <string name="settings_updates_desc">ନୂଆ RideLink ରିଲିଜ୍ ପାଇଁ ଯାଞ୍ଚ କରନ୍ତୁ</string>
     <string name="settings_about_desc">ସଂସ୍କରଣ, ଡେଭଲପର୍ ଏବଂ ଓପନ୍-ସୋର୍ସ ଲାଇସେନ୍ସ</string>
+    <string name="settings_exit">RideLink ବନ୍ଦ କରନ୍ତୁ</string>
+    <string name="settings_exit_desc">ବ୍ୟାଟେରୀ ସଞ୍ଚୟ ପାଇଁ RideLink ସମ୍ପୂର୍ଣ୍ଣ ବନ୍ଦ କରନ୍ତୁ</string>
+    <string name="settings_exit_confirm">ଏହା ସ୍କୁଟରକୁ ବିଚ୍ଛିନ୍ନ କରିବ ଏବଂ RideLink ପୃଷ୍ଠଭୂମିରେ ଚଲାଉଥିବା ସବୁକିଛି ବନ୍ଦ କରିବ। ଆପ୍ ପୁଣି ନ ଖୋଲିବା ପର୍ଯ୍ୟନ୍ତ ଏହା ବନ୍ଦ ରହିବ।</string>
+    <string name="settings_exit_action">ବନ୍ଦ କରନ୍ତୁ</string>
+    <string name="status_closing">RideLink ବନ୍ଦ ହେଉଛି…</string>
     <string name="settings_developer">ଡେଭଲପର୍ ବିକଳ୍ପ</string>
     <string name="settings_developer_mode">ଡେଭଲପର୍ ମୋଡ୍</string>
     <string name="settings_developer_mode_hint">କନସୋଲ୍ ଦେଖାଏ: ଫ୍ରେମ୍ ଲଗ୍, ଟେଷ୍ଟ ଫ୍ରେମ୍ ଏବଂ ଡେମୋ ରାଇଡ୍।</string>

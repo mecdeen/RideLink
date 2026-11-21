@@ -271,6 +271,11 @@
     <string name="settings_about">बारे च</string>
     <string name="settings_updates_desc">RideLink दा नमां वर्जन जांचो</string>
     <string name="settings_about_desc">वर्जन, डेवलपर ते ओपन-सोर्स लाइसेंस</string>
+    <string name="settings_exit">RideLink बंद करो</string>
+    <string name="settings_exit_desc">बैटरी बचाने आस्तै RideLink गी पूरी चाल्ली बंद करो</string>
+    <string name="settings_exit_confirm">इस कन्नै स्कूटर डिस्कनेक्ट होई जाग ते RideLink दे बैकग्राउंड च चलने आले सारे कम्म रुकी जाङन। ऐप परतियै खोलने तगर एह् बंद रौह्ग।</string>
+    <string name="settings_exit_action">बंद करो</string>
+    <string name="status_closing">RideLink बंद होआ करदा ऐ…</string>
     <string name="settings_developer">डेवलपर विकल्प</string>
     <string name="settings_developer_mode">डेवलपर मोड</string>
     <string name="settings_developer_mode_hint">कंसोल दस्सदा ऐ: फ्रेम लाग, टैस्ट फ्रेम ते डैमो राइड.</string>

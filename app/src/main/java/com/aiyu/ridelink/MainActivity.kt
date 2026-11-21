@@ -38,6 +38,10 @@ class MainActivity : ComponentActivity() {
                     onConnect = { ClusterService.start(this) },
                     onDisconnect = { ClusterService.stop(this) },
                     onCheckMaps = { RideNotificationListener.checkNow(this) },
+                    onExit = {
+                        ClusterService.exit(this)
+                        finishAndRemoveTask()
+                    },
                 )
             }
         }

@@ -47,6 +47,8 @@ Modules:
    and the armed scan brings it back at the next ignition on. Only an app out of battery optimisation does this: Android 12+
    blocks the restart otherwise, so that app keeps waiting in the foreground service.
    The quick settings tile (`ConnectionTileService`) opens `ConnectionPanelActivity`: status, connection switch, saved scooters.
+   The ride notification's Exit action (and Settings -> Exit RideLink) stops the session, scan,
+   notification listener and boot start, then ends the process; opening the app again undoes it (`appExited`).
 3. `ClusterLink` connects, requests MTU 512, enables notify on `5354`, then writes on `5352`
    with response, one frame at a time. Setup has a 15 s watchdog; a drop, GATT error or failed discovery
    falls back to a background `autoConnect = true` connect plus a filtered scan for the scooter's address, and the

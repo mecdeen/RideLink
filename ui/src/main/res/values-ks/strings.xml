@@ -271,6 +271,11 @@
     <string name="settings_about">مُتعلِق</string>
     <string name="settings_updates_desc">نٔو RideLink رِلیٖز چیک کٔرِو</string>
     <string name="settings_about_desc">وَرزن، ڈِویلپر تہٕ اوپَن سورس لایسَنس</string>
+    <string name="settings_exit">RideLink بند کٔرِو</string>
+    <string name="settings_exit_desc">بیٹری بچاونہٕ خٲطرٕ RideLink پوٗرٕ پٲٹھۍ بند کٔرِو</string>
+    <string name="settings_exit_confirm">امہِ سٟتؠ گژھِ سکوٗٹر ڈِسکنیکٹ تہٕ RideLink سُند بیک گراؤنڈ کٲم گژھِ بند۔ ایپ دوبارٕ کھولنَس تام روزِ یہِ بند۔</string>
+    <string name="settings_exit_action">بند کٔرِو</string>
+    <string name="status_closing">RideLink چھُ بند گژھان…</string>
     <string name="settings_developer">ڈِویلپر اِختیار</string>
     <string name="settings_developer_mode">ڈِویلپر موڈ</string>
     <string name="settings_developer_mode_hint">کنسول ہاوان: فریم لاگ، ٹیسٹ فریم تہٕ ڈیمو سوارِ۔</string>

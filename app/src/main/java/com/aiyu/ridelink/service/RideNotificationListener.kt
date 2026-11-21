@@ -22,6 +22,7 @@ import com.aiyu.ridelink.core.notify.CallNotice
 import com.aiyu.ridelink.core.notify.MessageAlert
 import com.aiyu.ridelink.core.notify.SocialNotificationParser
 import com.aiyu.ridelink.core.settings.AppLocale
+import com.aiyu.ridelink.core.settings.SettingsRepository
 import com.aiyu.ridelink.ui.ride.MapsCheck
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -38,6 +39,9 @@ import javax.inject.Inject
 class RideNotificationListener : NotificationListenerService() {
     @Inject lateinit var controller: ClusterController
     @Inject lateinit var turnIcons: MapsTurnIcons
+    @Inject lateinit var settings: SettingsRepository
+
+    private val scope = MainScope()
 
     /** Last update handled per Maps notification key, so [syncMaps] can tell which ones never reached us. */
     private val seenMaps = HashMap<String, String>()
@@ -225,6 +229,8 @@ class RideNotificationListener : NotificationListenerService() {
 
     override fun onListenerConnected() {
         instance = this
+        // Android binds the listener again after a reboot, which would wake an app the rider exited.
+        scope.launch { if (settings.current().appExited) release() }
         // A route started before the listener (re)bound is already in the shade; pick it up now.
         runCatching { activeNotifications }.getOrNull()
             ?.filter { it.packageName == MapsNotificationParser.MAPS_PACKAGE }
@@ -268,6 +274,16 @@ class RideNotificationListener : NotificationListenerService() {
         linkWatch = null
         music?.stop()
         music = null
+    }
+
+    override fun onDestroy() {
+        if (instance === this) instance = null
+        linkWatch?.cancel()
+        linkWatch = null
+        music?.stop()
+        music = null
+        scope.cancel()
+        super.onDestroy()
     }
 
     /** Last `when` + text per notification key: chat apps repost every chat on each message, only a change is new. */
@@ -353,6 +369,11 @@ class RideNotificationListener : NotificationListenerService() {
                 pm.setComponentEnabledSetting(component, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
             }
             runCatching { requestRebind(component) }
+        }
+
+        /** Unbinds from the system so it stops keeping the process alive; ClusterService rebinds on the next start. */
+        fun release() {
+            instance?.let { runCatching { it.requestUnbind() } }
         }
 
         /** Swiggy, Zomato, Blinkit, Zepto, Swiggy Instamart (same app), Dunzo. */

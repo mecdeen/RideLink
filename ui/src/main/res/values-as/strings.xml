@@ -271,6 +271,11 @@
     <string name="settings_about">বিষয়ে</string>
     <string name="settings_updates_desc">নতুন RideLink ৰিলিজ চাওক</string>
     <string name="settings_about_desc">সংস্কৰণ, ডেভেলপাৰ আৰু অপেন-ছ\'ৰ্চ অনুজ্ঞাপত্ৰ</string>
+    <string name="settings_exit">RideLink বন্ধ কৰক</string>
+    <string name="settings_exit_desc">বেটাৰী ৰাহি কৰিবলৈ RideLink সম্পূৰ্ণৰূপে বন্ধ কৰক</string>
+    <string name="settings_exit_confirm">ইয়াৰ ফলত স্কুটাৰৰ সংযোগ বিচ্ছিন্ন হ’ব আৰু RideLink-এ নেপথ্যত চলোৱা সকলো কাম বন্ধ হ’ব। এপটো পুনৰ নোখোলালৈকে ই বন্ধ হৈ থাকিব।</string>
+    <string name="settings_exit_action">বন্ধ কৰক</string>
+    <string name="status_closing">RideLink বন্ধ হৈ আছে…</string>
     <string name="settings_developer">ডেভেলপাৰ বিকল্প</string>
     <string name="settings_developer_mode">ডেভেলপাৰ ম\'ড</string>
     <string name="settings_developer_mode_hint">কনছ\'ল দেখুৱায়: ফ্ৰেম লগ, টেষ্ট ফ্ৰেম আৰু ডেম\' ৰাইড।</string>

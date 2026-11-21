@@ -19,7 +19,7 @@ class BootReceiver : BroadcastReceiver() {
         if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
         val pending = goAsync()
         CoroutineScope(Dispatchers.IO).launch {
-            runCatching { if (settings.current().deviceAddress != null) ClusterService.start(context) }
+            runCatching { settings.current().takeIf { it.deviceAddress != null && !it.appExited }?.let { ClusterService.start(context) } }
             pending.finish()
         }
     }

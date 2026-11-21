@@ -271,6 +271,11 @@
     <string name="settings_about">ॲपबद्दल</string>
     <string name="settings_updates_desc">नवीन RideLink आवृत्ती तपासा</string>
     <string name="settings_about_desc">आवृत्ती, डेव्हलपर आणि ओपन-सोर्स परवाने</string>
+    <string name="settings_exit">RideLink बंद करा</string>
+    <string name="settings_exit_desc">बॅटरी वाचवण्यासाठी RideLink पूर्णपणे बंद करा</string>
+    <string name="settings_exit_confirm">यामुळे स्कूटर डिस्कनेक्ट होईल आणि RideLink पार्श्वभूमीत चालवत असलेले सर्व काही थांबेल. ॲप पुन्हा उघडेपर्यंत ते बंद राहील.</string>
+    <string name="settings_exit_action">बंद करा</string>
+    <string name="status_closing">RideLink बंद होत आहे…</string>
     <string name="settings_developer">डेव्हलपर पर्याय</string>
     <string name="settings_developer_mode">डेव्हलपर मोड</string>
     <string name="settings_developer_mode_hint">कन्सोल दाखवतो: फ्रेम लॉग, चाचणी फ्रेम आणि डेमो राइड.</string>

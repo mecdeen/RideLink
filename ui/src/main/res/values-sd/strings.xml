@@ -271,6 +271,11 @@
     <string name="settings_about">بابت</string>
     <string name="settings_updates_desc">نئين RideLink رليز لاءِ چيڪ ڪريو</string>
     <string name="settings_about_desc">ورزن، ڊولپر ۽ اوپن سورس لائسنس</string>
+    <string name="settings_exit">RideLink بند ڪريو</string>
+    <string name="settings_exit_desc">بيٽري بچائڻ لاءِ RideLink مڪمل طور بند ڪريو</string>
+    <string name="settings_exit_confirm">ان سان اسڪوٽر ڊسڪنيڪٽ ٿي ويندو ۽ RideLink جو پس منظر ۾ هلندڙ سڀ ڪم بند ٿي ويندو. ايپ ٻيهر کولڻ تائين اهو بند رهندو.</string>
+    <string name="settings_exit_action">بند ڪريو</string>
+    <string name="status_closing">RideLink بند ٿي رهيو آهي…</string>
     <string name="settings_developer">ڊولپر آپشن</string>
     <string name="settings_developer_mode">ڊولپر موڊ</string>
     <string name="settings_developer_mode_hint">ڪنسول ڏيکاري ٿو: فريم لاگ، ٽيسٽ فريم ۽ ڊيمو سواري.</string>

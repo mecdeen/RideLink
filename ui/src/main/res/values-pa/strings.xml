@@ -271,6 +271,11 @@
     <string name="settings_about">ਬਾਰੇ</string>
     <string name="settings_updates_desc">ਨਵੇਂ RideLink ਰੀਲੀਜ਼ ਦੀ ਜਾਂਚ ਕਰੋ</string>
     <string name="settings_about_desc">ਵਰਜਨ, ਡਿਵੈਲਪਰ ਅਤੇ ਓਪਨ-ਸੋਰਸ ਲਾਇਸੰਸ</string>
+    <string name="settings_exit">RideLink ਬੰਦ ਕਰੋ</string>
+    <string name="settings_exit_desc">ਬੈਟਰੀ ਬਚਾਉਣ ਲਈ RideLink ਪੂਰੀ ਤਰ੍ਹਾਂ ਬੰਦ ਕਰੋ</string>
+    <string name="settings_exit_confirm">ਇਸ ਨਾਲ ਸਕੂਟਰ ਡਿਸਕਨੈਕਟ ਹੋ ਜਾਵੇਗਾ ਅਤੇ RideLink ਦਾ ਬੈਕਗ੍ਰਾਊਂਡ ਵਿੱਚ ਚੱਲਦਾ ਸਾਰਾ ਕੰਮ ਰੁਕ ਜਾਵੇਗਾ। ਐਪ ਦੁਬਾਰਾ ਖੋਲ੍ਹਣ ਤੱਕ ਇਹ ਬੰਦ ਰਹੇਗਾ।</string>
+    <string name="settings_exit_action">ਬੰਦ ਕਰੋ</string>
+    <string name="status_closing">RideLink ਬੰਦ ਹੋ ਰਿਹਾ ਹੈ…</string>
     <string name="settings_developer">ਡਿਵੈਲਪਰ ਵਿਕਲਪ</string>
     <string name="settings_developer_mode">ਡਿਵੈਲਪਰ ਮੋਡ</string>
     <string name="settings_developer_mode_hint">ਕੰਸੋਲ ਦਿਖਾਉਂਦਾ ਹੈ: ਫਰੇਮ ਲੌਗ, ਟੈਸਟ ਫਰੇਮ ਅਤੇ ਡੈਮੋ ਰਾਈਡ।</string>

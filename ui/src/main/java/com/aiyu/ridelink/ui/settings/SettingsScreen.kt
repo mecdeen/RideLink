@@ -72,6 +72,7 @@ import androidx.compose.material.icons.rounded.Call
 import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.Navigation
 import androidx.compose.material.icons.rounded.PhoneAndroid
+import androidx.compose.material.icons.rounded.PowerSettingsNew
 import androidx.compose.material.icons.rounded.TextFields
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -133,6 +134,7 @@ fun SettingsScreen(
     onOpenConsole: () -> Unit,
     onOpenUpdates: () -> Unit,
     onOpenAbout: () -> Unit,
+    onExit: () -> Unit,
 ) {
     val s by vm.settings.collectAsStateWithLifecycle()
     val detected by vm.detected.collectAsStateWithLifecycle()
@@ -173,6 +175,21 @@ fun SettingsScreen(
         }
     }
 
+    var confirmExit by remember { mutableStateOf(false) }
+    if (confirmExit) {
+        AlertDialog(
+            onDismissRequest = { confirmExit = false },
+            title = { Text(stringResource(R.string.settings_exit)) },
+            text = { Text(stringResource(R.string.settings_exit_confirm)) },
+            confirmButton = {
+                TextButton(onClick = { confirmExit = false; onExit() }) { Text(stringResource(R.string.settings_exit_action)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmExit = false }) { Text(stringResource(R.string.cancel)) }
+            },
+        )
+    }
+
     val twoPane = isTwoPane()
     // Two panes: the section list stays on the start side and this one is open beside it.
     var openSection by rememberSaveable { mutableStateOf(section ?: SettingsSection.SCOOTER) }
@@ -201,6 +218,12 @@ fun SettingsScreen(
                     }
                     item { Section(R.string.settings_developer) }
                     item { SectionGroup(listOf(SettingsSection.DEVELOPER), current, open) }
+                    item { Spacer(Modifier.height(Dimens.xl)) }
+                    item {
+                        Group {
+                            LinkRow(Icons.Rounded.PowerSettingsNew, stringResource(R.string.settings_exit), stringResource(R.string.settings_exit_desc)) { confirmExit = true }
+                        }
+                    }
                     item { BottomBarSpacer() }
         }
         val pageItems: LazyListScope.(SettingsSection) -> Unit = { page ->
