@@ -87,7 +87,7 @@ class CallControl @Inject constructor(@ApplicationContext private val context: C
         if (!granted(Manifest.permission.READ_CALL_LOG)) return@withContext null
         repeat(5) {
             if (it > 0) delay(1_000)
-            lastMissed(since)?.let { (number, name) -> return@withContext name ?: number }
+            lastMissed(since)?.let { (number, name) -> return@withContext name ?: ContactNames.lookup(context, number) ?: number }
         }
         null
     }

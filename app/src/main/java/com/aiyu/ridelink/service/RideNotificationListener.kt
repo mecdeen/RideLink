@@ -21,6 +21,7 @@ import com.aiyu.ridelink.core.nav.MapsTurnIcons
 import com.aiyu.ridelink.core.notify.CallNotice
 import com.aiyu.ridelink.core.notify.MessageAlert
 import com.aiyu.ridelink.core.notify.SocialNotificationParser
+import com.aiyu.ridelink.core.phone.ContactNames
 import com.aiyu.ridelink.core.settings.AppLocale
 import com.aiyu.ridelink.core.settings.SettingsRepository
 import com.aiyu.ridelink.ui.ride.MapsCheck
@@ -200,9 +201,11 @@ class RideNotificationListener : NotificationListenerService() {
             @Suppress("DEPRECATION")
             n.extras.getParcelable<Person>(Notification.EXTRA_CALL_PERSON)?.name?.toString()
         } else null
-        return n.extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()?.takeIf { it.isNotBlank() }
+        val shown = n.extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()?.takeIf { it.isNotBlank() }
             ?: person?.takeIf { it.isNotBlank() }
             ?: n.extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()?.takeIf { it.isNotBlank() }
+        // Some dialers title the call with the bare number; Contacts may know the name.
+        return shown?.let { ContactNames.nameOf(this, it) }
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {

@@ -72,7 +72,7 @@
     <string name="perm_listener_title">Notification access needed</string>
     <string name="perm_listener_body">Lets RideLink read Google Maps directions and incoming calls to show them on the scooter.</string>
     <string name="perm_phone_title">Signal, weather and calls</string>
-    <string name="perm_phone_body">Phone state, approximate location, call control and call history let the display show your signal bars, 4G/5G, weather, where you are and missed calls, and let the scooter switch answer calls.</string>
+    <string name="perm_phone_body">Phone state, approximate location, call control, call history and contacts let the display show your signal bars, 4G/5G, weather, where you are, who is calling and missed calls, and let the scooter switch answer calls.</string>
     <string name="perm_open_settings">Open settings</string>
     <string name="settings_sx_title">SmartXonnect display (Race XP)</string>
     <string name="settings_brightness">Display brightness: %1$d of %2$d</string>

@@ -7,12 +7,13 @@ import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import androidx.core.content.ContextCompat
 import com.aiyu.ridelink.core.ClusterController
+import com.aiyu.ridelink.core.phone.ContactNames
 import com.aiyu.ridelink.ui.R
 
 /**
  * Backup for incoming calls, like the stock app's phone-state listener: some dialers post a call notification
- * RideNotificationListener cannot recognise. Ringing sends the caller at once (the number when call-log access is
- * granted, else "Incoming call"); when the dialer's notification arrives with a contact name, that name replaces it.
+ * RideNotificationListener cannot recognise. Ringing sends the caller at once (the contact name with Contacts access,
+ * else the number, else "Incoming call"); when the dialer's notification arrives with a contact name, that name replaces it.
  * Answered keeps the caller up (call indicator) until the call ends; a dialled call shows nothing, as in stock
  * PhoneStateReceiver. Needs READ_PHONE_STATE (the optional phone card on the Ride screen).
  *
@@ -32,7 +33,11 @@ class CallStateWatcher(private val context: Context, private val controller: Clu
                 TelephonyManager.CALL_STATE_RINGING -> {
                     ringing = true
                     // A name from the notification wins; only start the frames if nothing is showing yet.
-                    controller.onPhoneRinging(phoneNumber?.takeIf { it.isNotBlank() }?.removePrefix("+91") ?: context.getString(R.string.call_unknown))
+                    // The saved contact name when there is one, else the number.
+                    val number = phoneNumber?.takeIf { it.isNotBlank() }
+                    controller.onPhoneRinging(
+                        number?.let { ContactNames.lookup(context, it) ?: it.removePrefix("+91") } ?: context.getString(R.string.call_unknown),
+                    )
                 }
                 // Answered: keep the caller up for the whole call. The controller ignores a dialled call.
                 TelephonyManager.CALL_STATE_OFFHOOK -> {

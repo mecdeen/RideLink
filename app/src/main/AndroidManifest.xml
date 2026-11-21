@@ -23,6 +23,8 @@
     <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
     <!-- Missed-call badge on older Ntorq displays. -->
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <!-- Caller's contact name on the display when only the number is known. -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
     <!-- "Reject with SMS" from the scooter switch, and the ride check-in text. -->
     <uses-permission android:name="android.permission.SEND_SMS" />
     <!-- Lets the scooter's voice button open the assistant while RideLink is in the background. -->

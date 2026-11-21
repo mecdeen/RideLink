@@ -21,7 +21,7 @@ Modules:
 - `core` => no UI. `protocol/` (frame encoder, models, turn/weather tables, `DisplayTelemetry` parser),
   `ble/ClusterLink` (GATT), `ClusterController` (ride session logic), `nav/MapsNotificationParser`,
   `notify/SocialNotificationParser`, `weather/WeatherRepository` (Open-Meteo + coarse location + Geocoder),
-  `phone/CallControl` (TelecomManager), `display/DisplayTemplate` (live custom lines), `settings/` (DataStore),
+  `phone/CallControl` (TelecomManager), `phone/ContactNames` (caller number -> contact name), `display/DisplayTemplate` (live custom lines), `settings/` (DataStore),
   `analytics/` (`RideMath` pure stats, `RideRecorder` auto-records rides, `RideStore` framework SQLite),
   `care/` (`CareMath` mileage + due status, `FuelWatch` refuel / low fuel, `CareMonitor`, `CareStore` care.db),
   `phone/RideCheckIn` (start/end SMS).
