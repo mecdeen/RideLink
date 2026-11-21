@@ -32,6 +32,11 @@
     <string name="pair_rescan">Scan again</string>
     <string name="hero_demo">Demo ride</string>
     <string name="dash_no_route">No route. Start navigation in Google Maps.</string>
+    <string name="dash_check_maps">Check Maps</string>
+    <string name="dash_check_found">Route found. Loading it on the display.</string>
+    <string name="dash_check_none">No Maps route in your notifications. Start navigation in Google Maps, then check again.</string>
+    <string name="dash_check_reconnecting">Reconnecting to notifications. Try again in a few seconds.</string>
+    <string name="dash_check_no_access">Notification access is off. Turn it on for RideLink.</string>
     <string name="dash_speed">Speed</string>
     <string name="dash_kmh">km/h</string>
     <string name="dash_eta">ETA</string>

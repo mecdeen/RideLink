@@ -13,6 +13,7 @@ import android.os.Build
 import android.provider.Telephony
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
+import androidx.core.app.NotificationManagerCompat
 import com.aiyu.ridelink.core.ClusterController
 import com.aiyu.ridelink.core.ble.LinkState
 import com.aiyu.ridelink.core.nav.MapsNotificationParser
@@ -21,6 +22,7 @@ import com.aiyu.ridelink.core.notify.CallNotice
 import com.aiyu.ridelink.core.notify.MessageAlert
 import com.aiyu.ridelink.core.notify.SocialNotificationParser
 import com.aiyu.ridelink.core.settings.AppLocale
+import com.aiyu.ridelink.ui.ride.MapsCheck
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -50,24 +52,7 @@ class RideNotificationListener : NotificationListenerService() {
         val title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()
         val text = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()
         when {
-            sbn.packageName == MapsNotificationParser.MAPS_PACKAGE -> {
-                seenMaps[sbn.key] = mapsUpdateId(sbn)
-                val sub = extras.getCharSequence(Notification.EXTRA_SUB_TEXT)?.toString()
-                // Maps names only the street; the turn direction is in the large icon.
-                val turn = runCatching { turnIcons.classify(n.getLargeIcon()) }.getOrNull()
-                val step = MapsNotificationParser.parse(title, text, sub, turn?.maneuver)
-                if (step == null) {
-                    noteOnce("Maps not parsed: title=$title | text=$text | sub=$sub")
-                    return
-                }
-                noteOnce(
-                    "Maps: ${step.instruction} = ${step.maneuver} (" +
-                        (turn?.let { "icon ${it.name.removePrefix("maneuver_")} %.2f".format(it.score) }
-                            ?: "icon not matched, ${turnIcons.templateCount} Maps icons") + ")",
-                )
-                lastNavKey = sbn.key
-                controller.onNavigation(step)
-            }
+            sbn.packageName == MapsNotificationParser.MAPS_PACKAGE -> handleMaps(sbn)
             n.category == Notification.CATEGORY_CALL -> {
                 val incoming = isIncoming(n)
                 noteOnce("Call ${if (incoming) "ringing" else "not ringing"}: ${sbn.packageName} title=$title | text=$text")
@@ -129,6 +114,42 @@ class RideNotificationListener : NotificationListenerService() {
         RemoteInput.addResultsToIntent(inputs, fill, results)
         action.actionIntent.send(this, 0, fill)
     }.isSuccess
+
+    /** Turns a Maps notification into a route step. False when it is not a turn notification the parser knows. */
+    private fun handleMaps(sbn: StatusBarNotification): Boolean {
+        val n = sbn.notification
+        val extras = n.extras
+        val title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()
+        val text = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()
+        seenMaps[sbn.key] = mapsUpdateId(sbn)
+        val sub = extras.getCharSequence(Notification.EXTRA_SUB_TEXT)?.toString()
+        // Maps names only the street; the turn direction is in the large icon.
+        val turn = runCatching { turnIcons.classify(n.getLargeIcon()) }.getOrNull()
+        val step = MapsNotificationParser.parse(title, text, sub, turn?.maneuver)
+        if (step == null) {
+            noteOnce("Maps not parsed: title=$title | text=$text | sub=$sub")
+            return false
+        }
+        noteOnce(
+            "Maps: ${step.instruction} = ${step.maneuver} (" +
+                (turn?.let { "icon ${it.name.removePrefix("maneuver_")} %.2f".format(it.score) }
+                    ?: "icon not matched, ${turnIcons.templateCount} Maps icons") + ")",
+        )
+        lastNavKey = sbn.key
+        controller.onNavigation(step)
+        return true
+    }
+
+    /**
+     * The rider's "Check Maps": reads every Maps notification in the shade again, even ones already handled, for a
+     * route whose first notification never arrived. Null when Android does not serve the shade to this listener.
+     */
+    private fun checkMaps(): Boolean? {
+        val shade = runCatching { activeNotifications }.getOrNull() ?: return null
+        val maps = shade.filter { it.packageName == MapsNotificationParser.MAPS_PACKAGE }
+        controller.note("Check Maps: ${maps.size} Maps notification(s) in the shade")
+        return maps.map(::handleMaps).any { it }
+    }
 
     private fun mapsUpdateId(sbn: StatusBarNotification): String {
         val extras = sbn.notification.extras
@@ -305,6 +326,20 @@ class RideNotificationListener : NotificationListenerService() {
 
         /** Catches up on missed Maps updates. False when the listener is not connected and needs [rebind]. */
         fun sync(): Boolean = instance?.syncMaps() == true
+
+        /** Backs the Check Maps button. A listener Android no longer serves is force-reconnected; its connect reads the shade. */
+        fun checkNow(context: Context): MapsCheck {
+            if (context.packageName !in NotificationManagerCompat.getEnabledListenerPackages(context)) return MapsCheck.NoAccess
+            return when (instance?.checkMaps()) {
+                true -> MapsCheck.Found
+                false -> MapsCheck.NoRoute
+                null -> {
+                    instance?.controller?.note("Check Maps: listener not connected, reconnecting")
+                    rebind(context, force = true)
+                    MapsCheck.Reconnecting
+                }
+            }
+        }
 
         /**
          * Asks Android to connect the listener again. [force] also switches the component off and on, which recovers

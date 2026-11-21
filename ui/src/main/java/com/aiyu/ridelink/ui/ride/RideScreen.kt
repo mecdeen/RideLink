@@ -48,6 +48,7 @@ import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material.icons.rounded.RoundaboutLeft
 import androidx.compose.material.icons.rounded.RoundaboutRight
 import androidx.compose.material.icons.rounded.SignalCellularAlt
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Straight
 import androidx.compose.material.icons.rounded.TwoWheeler
 import androidx.compose.material.icons.rounded.UTurnLeft
@@ -124,7 +125,7 @@ import com.aiyu.ridelink.ui.nav.TwoPane
 import com.aiyu.ridelink.ui.nav.isTwoPane
 
 @Composable
-fun RideScreen(vm: MainViewModel, onConnect: () -> Unit, onDisconnect: () -> Unit, onOpenCare: () -> Unit) {
+fun RideScreen(vm: MainViewModel, onConnect: () -> Unit, onDisconnect: () -> Unit, onOpenCare: () -> Unit, onCheckMaps: () -> MapsCheck) {
     val context = LocalContext.current
     val settings by vm.settings.collectAsStateWithLifecycle()
     val link by vm.linkState.collectAsStateWithLifecycle()
@@ -190,8 +191,9 @@ fun RideScreen(vm: MainViewModel, onConnect: () -> Unit, onDisconnect: () -> Uni
     val status: @Composable ColumnScope.() -> Unit = {
             HeroCard(link, paired, settings.deviceName, demo)
             if (paired) BikeChips(bikes, settings.deviceAddress, bluetoothOk, onSelect = vm::select, onAdd = { pairing = true })
-            AnimatedVisibility(nav != null || speed != null, enter = expandVertically() + fadeIn(), exit = shrinkVertically() + fadeOut()) {
-                RideDashboard(nav, speed)
+            // A running session shows the card even without a route, so the rider can check Maps for one.
+            AnimatedVisibility(nav != null || speed != null || rideOn, enter = expandVertically() + fadeIn(), exit = shrinkVertically() + fadeOut()) {
+                RideDashboard(nav, speed, onCheckMaps)
             }
     }
     val details: @Composable ColumnScope.() -> Unit = {
@@ -345,7 +347,7 @@ private fun meters(m: Int) = if (m >= 1000) "%.1f km".format(m / 1000f) else "$m
 
 /** What the scooter display shows: big turn arrow, distance to the turn, ETA and speed. */
 @Composable
-private fun RideDashboard(step: NavStep?, speed: Int?) {
+private fun RideDashboard(step: NavStep?, speed: Int?, onCheckMaps: () -> MapsCheck) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
         shape = MaterialTheme.shapes.extraLarge,
@@ -368,7 +370,30 @@ private fun RideDashboard(step: NavStep?, speed: Int?) {
                         Text(step.instruction, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onTertiaryContainer)
                     }
                 } else {
-                    Text(stringResource(R.string.dash_no_route), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                    // Maps sometimes starts a route without the listener hearing it; the button reads the shade instead.
+                    var check by remember { mutableStateOf<MapsCheck?>(null) }
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Dimens.sm)) {
+                        Text(stringResource(R.string.dash_no_route), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onTertiaryContainer)
+                        FilledTonalButton(onClick = { check = onCheckMaps() }) {
+                            Icon(Icons.Rounded.Search, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.size(Dimens.sm))
+                            Text(stringResource(R.string.dash_check_maps))
+                        }
+                        check?.let {
+                            Text(
+                                stringResource(
+                                    when (it) {
+                                        MapsCheck.Found -> R.string.dash_check_found
+                                        MapsCheck.NoRoute -> R.string.dash_check_none
+                                        MapsCheck.Reconnecting -> R.string.dash_check_reconnecting
+                                        MapsCheck.NoAccess -> R.string.dash_check_no_access
+                                    },
+                                ),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                            )
+                        }
+                    }
                 }
             }
             Spacer(Modifier.height(Dimens.lg))

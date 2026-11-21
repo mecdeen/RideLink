@@ -66,6 +66,7 @@ import com.aiyu.ridelink.ui.console.ConsoleScreen
 import com.aiyu.ridelink.ui.nav.FloatingNavBar
 import com.aiyu.ridelink.ui.nav.LocalBottomBarInset
 import com.aiyu.ridelink.ui.nav.NavTab
+import com.aiyu.ridelink.ui.ride.MapsCheck
 import com.aiyu.ridelink.ui.ride.RideScreen
 import com.aiyu.ridelink.ui.settings.SettingsScreen
 import com.aiyu.ridelink.ui.update.UpdateHost
@@ -93,7 +94,7 @@ private const val SETTINGS = "settings:"
 private const val RIDE = "ride:"
 
 @Composable
-fun RideLinkRoot(onConnect: () -> Unit, onDisconnect: () -> Unit) {
+fun RideLinkRoot(onConnect: () -> Unit, onDisconnect: () -> Unit, onCheckMaps: () -> MapsCheck) {
     val vm: MainViewModel = hiltViewModel()
     val updates: UpdateViewModel = hiltViewModel()
     var tab by rememberSaveable { mutableIntStateOf(0) }
@@ -160,7 +161,7 @@ fun RideLinkRoot(onConnect: () -> Unit, onDisconnect: () -> Unit) {
                 top == null -> Tabs(tab, { tab = it }) { current ->
                     holder.SaveableStateProvider("tab:$current") {
                         when (current) {
-                            0 -> RideScreen(vm, connect, disconnect, onOpenCare = { push(Page.Care.name) })
+                            0 -> RideScreen(vm, connect, disconnect, onOpenCare = { push(Page.Care.name) }, onCheckMaps = onCheckMaps)
                             1 -> AnalyticsScreen(onOpenRide = { push(RIDE + it) }, onOpenHistory = { push(Page.History.name) })
                             else -> settings(null)
                         }

@@ -17,6 +17,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.splashscreen.SplashScreenViewProvider
 import com.aiyu.ridelink.core.settings.AppLocale
 import com.aiyu.ridelink.service.ClusterService
+import com.aiyu.ridelink.service.RideNotificationListener
 import com.aiyu.ridelink.ui.RideLinkRoot
 import com.aiyu.ridelink.ui.theme.RideLinkTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,6 +37,7 @@ class MainActivity : ComponentActivity() {
                 RideLinkRoot(
                     onConnect = { ClusterService.start(this) },
                     onDisconnect = { ClusterService.stop(this) },
+                    onCheckMaps = { RideNotificationListener.checkNow(this) },
                 )
             }
         }
