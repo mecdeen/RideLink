@@ -42,7 +42,8 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.aiyu.ridelink"
+        // `-PappId=com.example.ridelink` builds a copy that installs beside the official app (own key, own ID).
+        applicationId = providers.gradleProperty("appId").orNull?.takeIf { it.isNotBlank() } ?: "com.aiyu.ridelink"
         minSdk = 26
         targetSdk = 35
         versionCode = versionCodeOf(appVersionName)

@@ -128,6 +128,8 @@ Modules:
   `chore(release): vX` commit on master) builds the signed `RideLink-<version>.apk` and publishes the Release.
   The PR step needs "Allow GitHub Actions to create pull requests" in the repo settings; without it, bump
   `VERSION` + `CHANGELOG.md` with `scripts/release-version.mjs` / `release-notes.mjs` and push `chore(release): vX`.
+- A personal copy that installs beside the official app: `./gradlew :app:assembleRelease -PappId=com.mecdeen.ridelink`.
+  Only `com.aiyu.ridelink` self-updates, so such a copy never offers the official APK.
 - The app updates itself from those releases (`core/update/AppUpdater`). Debug builds (`.debug`, "RideLink Dev",
   DEV icon tag) never self-update.
 

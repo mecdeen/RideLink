@@ -313,7 +313,7 @@
     <string name="update_last_checked">Last checked %1$s</string>
     <string name="update_not_checked">Not checked yet</string>
     <string name="update_check">Check for updates</string>
-    <string name="update_debug_build">This is a debug build. Updates are for release builds installed from GitHub.</string>
+    <string name="update_debug_build">This build cannot update itself. Updates are for the official release installed from GitHub.</string>
     <string name="update_auto">Check on start</string>
     <string name="update_auto_desc">Look for a new release when RideLink opens, at most once an hour. Only the public release list is fetched.</string>
     <string name="update_channel">Release channel</string>

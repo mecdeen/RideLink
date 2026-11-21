@@ -47,8 +47,11 @@ class AppUpdater @Inject constructor(
     val installedName: String = runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull() ?: "?"
     private val installed: Version? = Version.parse(installedName)
 
-    /** Debug builds are another package (`.debug`) signed with the debug key; a release APK can never replace them. */
-    val supported: Boolean = !context.packageName.endsWith(".debug")
+    /**
+     * Only the official package updates itself: debug builds (`.debug`, debug key) and copies built with another
+     * app ID (`-PappId`) can never be replaced by an APK from [Releases.REPOSITORY].
+     */
+    val supported: Boolean = context.packageName == OFFICIAL_PACKAGE
 
     /**
      * Ask GitHub what exists. [manual] is the Check button: it says so when nothing is new and ignores a snooze.
@@ -203,6 +206,7 @@ class AppUpdater @Inject constructor(
 
     companion object {
         const val ACTION_STATUS = "com.aiyu.ridelink.UPDATE_INSTALL_STATUS"
+        private const val OFFICIAL_PACKAGE = "com.aiyu.ridelink"
         private const val RECEIVER = "com.aiyu.ridelink.service.UpdateInstallReceiver"
         private const val DAY_MILLIS = 24L * 60 * 60 * 1000
         private const val MIN_GAP_MILLIS = 60L * 60 * 1000
